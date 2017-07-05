@@ -1,0 +1,172 @@
+I tensorflow/stream_executor/dso_loader.cc:135] successfully opened CUDA library libcublas.so.8.0 locally
+I tensorflow/stream_executor/dso_loader.cc:135] successfully opened CUDA library libcudnn.so.5 locally
+I tensorflow/stream_executor/dso_loader.cc:135] successfully opened CUDA library libcufft.so.8.0 locally
+I tensorflow/stream_executor/dso_loader.cc:135] successfully opened CUDA library libcuda.so.1 locally
+I tensorflow/stream_executor/dso_loader.cc:135] successfully opened CUDA library libcurand.so.8.0 locally
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE3 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX2 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use FMA instructions, but these are available on your machine and could speed up CPU computations.
+I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:910] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:885] Found device 0 with properties: 
+name: GeForce GTX 970
+major: 5 minor: 2 memoryClockRate (GHz) 1.253
+pciBusID 0000:01:00.0
+Total memory: 3.94GiB
+Free memory: 3.73GiB
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:906] DMA: 0 
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:916] 0:   Y 
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:975] Creating TensorFlow device (/gpu:0) -> (device: 0, name: GeForce GTX 970, pci bus id: 0000:01:00.0)
+I tensorflow/core/distributed_runtime/rpc/grpc_channel.cc:200] Initialize GrpcChannelCache for job ps -> {0 -> pco204-16.fit.vutbr.cz:4000}
+I tensorflow/core/distributed_runtime/rpc/grpc_channel.cc:200] Initialize GrpcChannelCache for job worker -> {0 -> localhost:4001}
+I tensorflow/core/distributed_runtime/rpc/grpc_server_lib.cc:221] Started server with target: grpc://localhost:4001
+2017-03-17 13:40:06,602 Logging started.
+2017-03-17 13:40:06,602 Netfile: resnet34.py.
+2017-03-17 13:40:06,602 Ps hosts: ['pco204-16.fit.vutbr.cz:4000'].
+2017-03-17 13:40:06,602 Worker hosts: ['pco204-15.fit.vutbr.cz:4001'].
+2017-03-17 13:40:06,602 Role: worker.
+2017-03-17 13:40:06,617 Loading net.
+2017-03-17 13:40:09,377 Create session.
+2017-03-17 13:40:09,377 b'grpc://localhost:4001'
+2017-03-17 13:40:09,377 Chief True.
+2017-03-17 13:40:09,378 Starting session.
+2017-03-17 13:40:09,378 Started session.
+I tensorflow/core/distributed_runtime/master_session.cc:1012] Start master session b26e90289d91340a with config: 
+allow_soft_placement: true
+
+2017-03-17 13:40:09,821 Session sync start.
+2017-03-17 13:40:09,865 Session sync end.
+2017-03-17 13:40:10,747 Weight load time: 0.8812778109968349
+2017-03-17 13:40:11,572 Weight load time: 0.8247483060004015
+2017-03-17 13:40:12,396 Weight load time: 0.8244341940007871
+2017-03-17 13:40:13,222 Weight load time: 0.8259171869976853
+2017-03-17 13:40:14,022 Weight load time: 0.7990838219993748
+2017-03-17 13:40:14,831 Weight load time: 0.8095568559983803
+2017-03-17 13:40:15,637 Weight load time: 0.8049641940015135
+2017-03-17 13:40:16,464 Weight load time: 0.827155061000667
+2017-03-17 13:40:17,270 Weight load time: 0.8060076280016801
+2017-03-17 13:40:18,087 Weight load time: 0.8166605629994592
+2017-03-17 13:40:18,894 Weight load time: 0.8074908099988534
+2017-03-17 13:40:19,718 Weight load time: 0.8233233040009509
+2017-03-17 13:40:20,519 Weight load time: 0.800803359998099
+2017-03-17 13:40:21,339 Weight load time: 0.82014914300089
+2017-03-17 13:40:22,144 Weight load time: 0.8045364489989879
+2017-03-17 13:40:22,965 Weight load time: 0.8204807719994278
+2017-03-17 13:40:23,773 Weight load time: 0.8087129039995489
+2017-03-17 13:40:24,600 Weight load time: 0.8264242879995436
+2017-03-17 13:40:25,404 Weight load time: 0.8040461509990564
+2017-03-17 13:40:26,229 Weight load time: 0.8248807710006076
+2017-03-17 13:40:27,033 Weight load time: 0.8031518580028205
+2017-03-17 13:40:27,843 Weight load time: 0.8099030800003675
+2017-03-17 13:40:28,647 Weight load time: 0.8045394769978884
+2017-03-17 13:40:29,461 Weight load time: 0.813316315998236
+2017-03-17 13:40:30,260 Weight load time: 0.7994976720001432
+2017-03-17 13:40:31,071 Weight load time: 0.8103310339974996
+2017-03-17 13:40:31,875 Weight load time: 0.8043463430003612
+2017-03-17 13:40:32,687 Weight load time: 0.8109848000021884
+2017-03-17 13:40:33,493 Weight load time: 0.8060069720013416
+2017-03-17 13:40:34,304 Weight load time: 0.8107757010002388
+2017-03-17 13:40:35,107 Weight load time: 0.8035742819993175
+2017-03-17 13:40:35,918 Weight load time: 0.8107375879990286
+2017-03-17 13:40:36,727 Weight load time: 0.8088085449999198
+2017-03-17 13:40:37,536 Weight load time: 0.8083902799990028
+2017-03-17 13:40:38,336 Weight load time: 0.800125564001064
+2017-03-17 13:40:39,152 Weight load time: 0.8157254449979519
+2017-03-17 13:40:39,954 Weight load time: 0.8016942050016951
+2017-03-17 13:40:40,773 Weight load time: 0.8188912690020516
+2017-03-17 13:40:41,575 Weight load time: 0.8022942050010897
+2017-03-17 13:40:42,392 Weight load time: 0.8162812890004716
+2017-03-17 13:40:43,195 Weight load time: 0.8030220879991248
+2017-03-17 13:40:44,011 Weight load time: 0.8162381069996627
+2017-03-17 13:40:44,813 Weight load time: 0.8010846590004803
+2017-03-17 13:40:45,624 Weight load time: 0.8113691830003518
+2017-03-17 13:40:46,430 Weight load time: 0.8057652679999592
+2017-03-17 13:40:47,247 Weight load time: 0.8170655149988306
+2017-03-17 13:40:48,050 Weight load time: 0.8023862109985203
+2017-03-17 13:40:48,859 Weight load time: 0.8093973349969019
+2017-03-17 13:40:49,663 Weight load time: 0.8034015750017716
+2017-03-17 13:40:50,473 Weight load time: 0.8101541040014126
+2017-03-17 13:40:51,274 Weight load time: 0.8008249580016127
+2017-03-17 13:40:52,087 Weight load time: 0.8127502620009182
+2017-03-17 13:40:52,891 Weight load time: 0.803980357999535
+2017-03-17 13:40:53,707 Weight load time: 0.816040232002706
+2017-03-17 13:40:54,515 Weight load time: 0.807441889999609
+2017-03-17 13:40:55,334 Weight load time: 0.8189879069977906
+2017-03-17 13:40:56,137 Weight load time: 0.8030667849998281
+2017-03-17 13:40:56,953 Weight load time: 0.8159271759977855
+2017-03-17 13:40:57,771 Weight load time: 0.8171593529987149
+2017-03-17 13:40:58,586 Weight load time: 0.8146374409989221
+2017-03-17 13:40:59,388 Weight load time: 0.8024053650005953
+2017-03-17 13:41:00,204 Weight load time: 0.8155782430003455
+2017-03-17 13:41:01,004 Weight load time: 0.7999350539976149
+2017-03-17 13:41:01,827 Weight load time: 0.822619577000296
+2017-03-17 13:41:02,632 Weight load time: 0.8052742230029253
+2017-03-17 13:41:03,448 Weight load time: 0.8156994430028135
+2017-03-17 13:41:04,255 Weight load time: 0.8066973480017623
+2017-03-17 13:41:05,073 Weight load time: 0.8177489720001176
+2017-03-17 13:41:05,881 Weight load time: 0.8081939879994025
+2017-03-17 13:41:06,690 Weight load time: 0.8088396950006427
+2017-03-17 13:41:07,491 Weight load time: 0.8011388049999368
+2017-03-17 13:41:08,308 Weight load time: 0.8163793509993411
+2017-03-17 13:41:09,118 Weight load time: 0.8096069690000149
+2017-03-17 13:41:09,936 Weight load time: 0.8178460600029211
+2017-03-17 13:41:10,744 Weight load time: 0.80809575999956
+2017-03-17 13:41:11,556 Weight load time: 0.8115501739994215
+2017-03-17 13:41:12,357 Weight load time: 0.801353178001591
+2017-03-17 13:41:13,179 Weight load time: 0.821618973997829
+2017-03-17 13:41:13,981 Weight load time: 0.8021689929992135
+2017-03-17 13:41:14,795 Weight load time: 0.8140491730009671
+2017-03-17 13:41:15,594 Weight load time: 0.7985515119980846
+2017-03-17 13:41:16,402 Weight load time: 0.8072524630006228
+2017-03-17 13:41:17,202 Weight load time: 0.8000408699990658
+2017-03-17 13:41:18,032 Weight load time: 0.8295822410000255
+2017-03-17 13:41:18,834 Weight load time: 0.802136275000521
+2017-03-17 13:41:19,650 Weight load time: 0.8157976010006678
+2017-03-17 13:41:20,461 Weight load time: 0.8106944570026826
+2017-03-17 13:41:21,284 Weight load time: 0.8229085909988498
+2017-03-17 13:41:22,087 Weight load time: 0.8030778920001467
+2017-03-17 13:41:22,921 Weight load time: 0.8337024969987397
+2017-03-17 13:41:23,724 Weight load time: 0.8034676909992413
+2017-03-17 13:41:24,538 Weight load time: 0.8135680420018616
+2017-03-17 13:41:25,339 Weight load time: 0.8005593879970547
+2017-03-17 13:41:26,153 Weight load time: 0.8136014750016329
+2017-03-17 13:41:26,957 Weight load time: 0.8042890180004179
+2017-03-17 13:41:27,763 Weight load time: 0.8059509500017157
+2017-03-17 13:41:28,576 Weight load time: 0.8131053319993953
+2017-03-17 13:41:29,389 Weight load time: 0.812026285999309
+2017-03-17 13:41:30,189 Weight load time: 0.800285535002331
+2017-03-17 13:41:30,997 Weight load time: 0.8081064209982287
+2017-03-17 13:41:31,798 Weight load time: 0.8000477649984532
+2017-03-17 13:41:32,617 Weight load time: 0.81936605699957
+2017-03-17 13:41:33,424 Weight load time: 0.8067950939985167
+2017-03-17 13:41:34,245 Weight load time: 0.820750794999185
+2017-03-17 13:41:35,052 Weight load time: 0.8063638560015534
+2017-03-17 13:41:35,865 Weight load time: 0.8134161240013782
+2017-03-17 13:41:36,670 Weight load time: 0.8047987390018534
+2017-03-17 13:41:37,485 Weight load time: 0.8150375080003869
+2017-03-17 13:41:38,295 Weight load time: 0.8095484709992888
+2017-03-17 13:41:39,113 Weight load time: 0.8175263179982721
+2017-03-17 13:41:39,916 Weight load time: 0.803541025998129
+2017-03-17 13:41:40,757 Weight load time: 0.8406361010020191
+2017-03-17 13:41:41,558 Weight load time: 0.8011627840023721
+2017-03-17 13:41:42,380 Weight load time: 0.8214790979982354
+2017-03-17 13:41:43,184 Weight load time: 0.8035895870016247
+2017-03-17 13:41:43,998 Weight load time: 0.814448020002601
+2017-03-17 13:41:44,802 Weight load time: 0.8036261089982872
+2017-03-17 13:41:45,618 Weight load time: 0.8155135420020088
+2017-03-17 13:41:46,420 Weight load time: 0.8020462039967242
+2017-03-17 13:41:47,239 Weight load time: 0.81922982299875
+2017-03-17 13:41:48,042 Weight load time: 0.8028019939993101
+2017-03-17 13:41:48,860 Weight load time: 0.8172903619997669
+2017-03-17 13:41:49,658 Weight load time: 0.7974904879993119
+2017-03-17 13:41:50,469 Weight load time: 0.8110837360000005
+2017-03-17 13:41:51,273 Weight load time: 0.80418642800214
+2017-03-17 13:41:52,084 Weight load time: 0.8108107099978952
+2017-03-17 13:41:52,894 Weight load time: 0.8100784510024823
+2017-03-17 13:41:53,709 Weight load time: 0.8143588669991004
+2017-03-17 13:41:53,709 Complete time: 103.84334216000207
+2017-03-17 13:41:53,710 Load stats: mean: 0.811119201914039 stdev: 0.01029051742957725
+2017-03-17 13:41:53,710 End sync start.
+2017-03-17 13:41:53,725 End sync end.

@@ -1,0 +1,271 @@
+\documentclass{beamer}
+
+\usepackage[czech,english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.13}
+\usepackage{lmodern}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,matrix,backgrounds}
+\usepackage{tikz-uml}
+\usepackage[orientation=portrait,size=a0,scale=1.5]{beamerposter}
+  
+\title[]{Paralelní trénování hlubokých neuronových sítí}
+\author[]{Bc. Ondřej Šlampa}
+\institute[]{Fakulta informačních technologií}
+\date{\today}
+\usetheme{Pittsburgh}
+
+\begin{document}
+\begin{frame}{}
+
+\input{tikz-definitions}
+
+\begin{beamercolorbox}{}
+\maketitle
+\end{beamercolorbox}
+
+\begin{block}{Synchronní trénování}
+
+Hlavní částí mé práce je vytvoření způsobu jak odhadovat výhodnost požití distribuovaného trénování pro danou síť.
+To je založeno na tom, že trénování je možné rozdělit na výpočet gradientů a komunikaci.
+Délku výpočtu gradientů je možné naměřit na jedné jednotce.
+Délka komunikace je možné vypočítat podle počtu vah.
+Z těchto dvou hodnot je možné vypočítat délku celého trénování.
+
+\begin{columns}[t]
+
+\begin{column}{0.48\linewidth}
+\begin{block}{Nejhorší rozložení komunikace}
+
+Obě jednotky komunikují se serverem současně, to způsobí, že rychlost přenosu dat bude poloviční a délka přenosu dvojnásobná.
+
+\begin{figure}
+\centering
+\scalebox{0.8}{
+\begin{tikzpicture}[align=left]
+\begin{umlseqdiag}
+    \umlobject[class=Zařízení,fill=white,x=0]{Pracovní jednotka 1}
+    \umlobject[class=Zařízení,fill=white,x=12]{Server}
+    \umlobject[class=Zařízení,fill=white,x=24]{Pracovní jednotka 2}
+    \begin{umlfragment}[type=iterace, name=iter, inner xsep=2]
+    \begin{umlcall}[op={přijmi váhy()},with return,dt=10,padding=13]{Pracovní jednotka 1}{Server}
+    \end{umlcall}
+    \begin{umlcall}[op={přijmi váhy()},with return,dt=10,padding=13]{Pracovní jednotka 2}{Server}
+    \end{umlcall}
+    \begin{umlcallself}[op={trénuj()},with return,dt=3,padding=3,fill=gray]{Pracovní jednotka 1}
+    \end{umlcallself}
+    \begin{umlcallself}[op={trénuj()},with return,dt=3,padding=3,fill=gray]{Pracovní jednotka 2}
+    \end{umlcallself}
+    \begin{umlcall}[op={odešli gradienty()},with return,dt=3,padding=13,fill=lightgray]{Pracovní jednotka 1}{Server}
+    \end{umlcall}
+    \begin{umlcall}[op={odešli gradienty()},with return,dt=3,padding=13,fill=lightgray]{Pracovní jednotka 2}{Server}
+    \end{umlcall}
+    \end{umlfragment}
+    \end{umlseqdiag}
+\end{tikzpicture}
+}
+\end{figure}
+
+\end{block}
+\end{column}
+
+\begin{column}{0.48\linewidth}
+\begin{block}{Nejlepší rozložení komunikace}
+
+Při tomto rozložení dochází k maximalizaci prokládání výpočtů a komunikace.
+Pokud jedna pracovní jednotka komunikuje se serverem, druhá počítá nebo čeká.
+
+\begin{figure}
+\centering
+\scalebox{0.8}{
+\begin{tikzpicture}[align=left]
+\begin{umlseqdiag}
+    \umlobject[class=Zařízení,fill=white,x=0]{Pracovní jednotka 1}
+    \umlobject[class=Zařízení,fill=white,x=12]{Server}
+    \umlobject[class=Zařízení,fill=white,x=24]{Pracovní jednotka 2}
+    \begin{umlfragment}[type=iterace, name=iter, inner xsep=2]
+    \begin{umlcall}[op={přijmi váhy()},with return,dt=10,padding=5]{Pracovní jednotka 1}{Server}
+    \end{umlcall}
+    \begin{umlcall}[op={přijmi váhy()},with return,dt=19,padding=5]{Pracovní jednotka 2}{Server}
+    \end{umlcall}
+    \begin{umlcallself}[op={trénuj()},with return,dt=3,padding=3,fill=gray]{Pracovní jednotka 1}
+    \end{umlcallself}
+    \begin{umlcallself}[op={trénuj()},with return,dt=3,padding=3,fill=gray]{Pracovní jednotka 2}
+    \end{umlcallself}
+    \begin{umlcall}[op={odešli gradienty()},with return,dt=3,padding=5,fill=lightgray]{Pracovní jednotka 1}{Server}
+    \end{umlcall}
+    \begin{umlcall}[op={odešli gradienty()},with return,dt=3,padding=5,fill=lightgray]{Pracovní jednotka 2}{Server}
+    \end{umlcall}
+    \end{umlfragment}
+    \end{umlseqdiag}
+\end{tikzpicture}
+}
+\end{figure}
+
+\end{block}
+\end{column}
+
+\end{columns}
+\end{block}
+
+\vspace{1em}
+\begin{block}{Porovnání odhadů a měření synchronního trénování}
+
+Úvahy ilustrované v předchozím bloku jsem použil k výpočtu odhadů zrychlení výpočtu na několika pracovních jednotkách.
+To je zobrazené na následujících grafech.
+
+\begin{columns}[t]
+
+\begin{column}{0.2\linewidth}
+\begin{block}{GoogLeNet}
+
+\begin{figure}
+\centering
+\scalebox{2.0}{
+\begin{tikzpicture}
+\begin{axis}[domain=1:8,xtick={1,2,3,4,5,6,7,8},xlabel={Počet pracovních jednotek},ylabel={Zrychlení},label style={font=\tiny},tick label style={font=\tiny},ymin=0,ymax=8]
+\addplot[color=black,mark=square*]coordinates{(1,0.6601502887)(2,1.3569755935)(3,1.6845214264)(4,1.7140744339)(5,1.744682906)(6,1.744682906)(7,1.744682906)(8,1.6845214264)};
+\addplot[color=lightgray,mark=*]coordinates{(1,0.7027592832)(2,1.0797030714)(3,1.3314030678)(4,1.4649503391)(5,1.6090284145)(6,1.6759416177)(7,1.7347251018)(8,1.7528795351)};
+\addplot[color=black,mark=square*,dashed]coordinates{(1,0.8074565515)(2,1.2855558254)(3,1.9157302497)(4,2.5051857111)(5,2.7914926495)(6,3.1516852495)(7,3.6186015827)(8,4.0709267806)};
+\addplot[color=lightgray,mark=*,dashed]coordinates{(1,0.992248062)(2,1.569093763)(3,2.2307898125)(4,2.8329983603)(5,3.5570531207)(6,4.1814025589)(7,4.83492834)(8,5.4032627024)};
+\end{axis}
+\end{tikzpicture}
+}
+\end{figure}
+
+\end{block}
+\end{column}
+
+\begin{column}{0.2\linewidth}
+\begin{block}{SqueezeNet}
+
+\begin{figure}
+\centering
+\scalebox{2.0}{
+\begin{tikzpicture}
+\begin{axis}[domain=1:8,xtick={1,2,3,4,5,6,7,8},xlabel={Počet pracovních jednotek},ylabel={Zrychlení},label style={font=\tiny},tick label style={font=\tiny},ymin=0,ymax=8]
+\addplot[color=black,mark=square*]coordinates{(1,1.306122449)(2,2.4615384615)(3,3.4594594595)(4,4.1290322581)(5,4.9230769231)(6,5.5652173913)(7,5.8181818182)(8,6.4)};
+\addplot[color=lightgray,mark=*]coordinates{(1,1.2291076898)(2,2.2981199353)(3,3.2838351138)(4,4.0569683372)(5,4.8952877237)(6,5.5134372866)(7,6.0974104024)(8,6.5219881601)};
+\addplot[color=black,mark=square*,dashed]coordinates{(1,1.3473684211)(2,2.5098039216)(3,3.5555555556)(4,4)(5,4.7407407407)(6,5.5652173913)(7,5.8181818182)(8,6.4)};
+\addplot[color=lightgray,mark=*,dashed]coordinates{(1,1.3095612077)(2,2.490303696)(3,3.7126663393)(4,4.8046936965)(5,6.0733903008)(6,7.1581776491)(7,8.272391696)(8,9.2322273034)};
+\end{axis}
+\end{tikzpicture}
+}
+\end{figure}
+
+\end{block}
+\end{column}
+
+\begin{column}{0.45\linewidth}
+\begin{block}{Resnet34}
+
+\begin{figure}
+\centering
+\scalebox{2.0}{
+\begin{tikzpicture}
+\begin{axis}[domain=1:8,xtick={1,2,3,4,5,6,7,8},xlabel={Počet pracovních jednotek},ylabel={Zrychlení},legend pos=outer north east,label style={font=\tiny},tick label style={font=\tiny},legend style={font=\tiny},ymin=0,ymax=8]
+\addplot[color=black,mark=square*]coordinates{(1,0.4508741315)(2,0.5332673737)(3,0.5558395377)(4,0.5332673737)(5,0.5558395377)(6,0.5415137764)(7,0.5252683631)(8,0.5252683631)};
+\addplot[color=lightgray,mark=*]coordinates{(1,0.3997081134)(2,0.4966705391)(3,0.5464628319)(4,0.5597317406)(5,0.5852335211)(6,0.5880164777)(7,0.5921446289)(8,0.5855157104)};
+\addplot[color=black,mark=square*,dashed]coordinates{(1,0.8337593066)(2,0.9550333875)(3,1.2359255603)(4,1.3643334108)(5,1.7508945438)(6,2.0202629352)(7,2.1010734526)(8,2.1439525026)};
+\addplot[color=lightgray,mark=*,dashed]coordinates{(1,1)(2,1.0058906208)(3,1.3149228513)(4,1.6113233322)(5,1.9835271161)(6,2.3025694526)(7,2.6394072908)(8,2.9309359055)};
+\legend{Centrální server - měření,Centrální server - výpočet,Distribuovaný server - měření,Distribuovaný server - výpočet}
+\end{axis}
+\end{tikzpicture}
+}
+\end{figure}
+
+\end{block}
+\end{column}
+
+\end{columns}
+\end{block}
+
+\vspace{1em}
+\begin{block}{Uložení vah}
+
+Ve své práci jsem popsal dva způsoby, jak sdílet váhy neuronové sítě.
+Váhy musí být sdíleny mezi všemi jednotkami, aby každá jednotka měla přístup k nejnovějším váhám, které použije pro výpočet gradientů.
+
+\begin{columns}[t]
+
+\begin{column}{0.51\linewidth}
+\begin{block}{Centrální server}
+
+Je mechanizmus uložení vah neuronové sítě na jedné dedikované jednotce.
+Ostatní jednotky sdílejí váhy přes tento server.
+Server provádí aktualizace vah sítě.
+Problém je, že když více jednotek přenáší data ze serveru nebo na server, komunikace je zpomalená.
+
+\begin{figure}
+\centering
+\scalebox{0.8}{
+\begin{tikzpicture}[auto,x=1em,y=1em,z=1em,node distance=7em and 5em,>=triangle 45,align=left]
+    \node [block_server](ps){Server s~parametry};
+    \node [block_worker,below=of ps](w2){Pracovní\\ jednotka 2};
+    \node [block_worker,left=of w2](w1){Pracovní\\ jednotka 1};
+    \node [block_worker,right=of w2](w3){Pracovní\\ jednotka 3};
+    \node [block_worker,right=of w3](w4){Pracovní\\ jednotka 4};
+    
+    \draw[->] ([xshift=10em]ps) -- node[]{$W$} (w1);
+    \draw[->] ([xshift=5em]ps) -- node[]{$W$} (w2);
+    \draw[->] ([xshift=7em]ps) -- node[]{$W$} (w3);
+    \draw[->] ([xshift=10em]ps) -- node[]{$W$} (w4);
+    
+    \draw[->] ([xshift=-10em]w1) -- node[]{$\Delta W_1$} (ps);
+    \draw[->] ([xshift=-5em]w2) -- node[]{$\Delta W_2$} (ps);
+    \draw[->] ([xshift=-7em]w3) -- node[]{$\Delta W_3$} (ps);
+    \draw[->] ([xshift=-10em]w4) -- node[]{$\Delta W_4$} (ps);
+\end{tikzpicture}
+}
+\end{figure}
+
+\end{block}
+\end{column}
+
+\begin{column}{0.45\linewidth}
+\begin{block}{Distribuovaný server}
+
+Cílem distribuovaného serveru je odstranit hlavní slabinu centrálního serveru.
+Váhy sítě jsou rozděleny na $N$ částí, každá část je uložené na jiné jednotce.
+Každá jednotka je tak server i výpočetní jednotka.
+
+\vspace{1em}
+\begin{figure}
+\centering
+\scalebox{0.8}{
+\begin{tikzpicture}[auto,x=1em,y=1em,z=1em,node distance=7em and 7em,>=triangle 45,align=left]
+    \node [block_worker](w1){Pracovní\\ jednotka 1};
+    \node [block_worker,right=of w1](w2){Pracovní\\ jednotka 2};
+    \node [block_worker,below=of w1](w3){Pracovní\\ jednotka 3};
+    \node [block_worker,below=of w2](w4){Pracovní\\ jednotka 4};
+    
+    \draw[->,transform canvas={yshift=1em}] (w1) -- node[]{$W^1$} (w2);
+    \draw[->,transform canvas={xshift=-1em}] (w1) -- node[]{$W^1$} (w3);
+    \draw[->,transform canvas={xshift=1em}] (w1) -- node[xshift=-3em,yshift=2em]{$W^1$} (w4);
+    
+    \draw[->,transform canvas={yshift=0em}] (w2) -- node[]{$W^2$} (w1);
+    \draw[->,transform canvas={xshift=1em}] (w2) -- node[xshift=3em,yshift=3em]{$W^2$} (w3);
+    \draw[->,transform canvas={xshift=2em}] (w2) -- node[]{$W^2$} (w4);
+    
+    \draw[->,transform canvas={xshift=-2em}] (w3) -- node[]{$W^3$} (w1);
+    \draw[->,transform canvas={xshift=-1em}] (w3) -- node[xshift=-2em,yshift=-2em]{$W^3$} (w2);
+    \draw[->,transform canvas={yshift=0em}] (w3) -- node[]{$W^3$} (w4);
+    
+    \draw[->,transform canvas={xshift=-1em}] (w4) -- node[xshift=3em,yshift=-2em]{$W^4$} (w1);
+    \draw[->,transform canvas={xshift=1em}] (w4) -- node[]{$W^4$} (w2);
+    \draw[->,transform canvas={yshift=-1em}] (w4) -- node[]{$W^4$} (w3);
+\end{tikzpicture}
+}
+\end{figure}
+
+\end{block}
+\end{column}
+
+\end{columns}
+\end{block}
+
+\end{frame}
+\end{document}
+

@@ -1,0 +1,823 @@
+\chapter{Obsah DVD}
+\label{chap:dvd}
+
+Tato příloha slouží k~popsání struktury paměťového média přiloženého k~této práci.
+Následující seznam je obsah kořenového adresáře média.
+
+\begin{description}[font=\ttfamily\bfseries]
+    \item[/report]
+    Zdrojové soubory této práce.
+    \item[/src]
+    Zdrojové soubory praktické části této práce.
+    \item[/local]
+    Logovací výpisy vytvořené skriptem pro lokální trénování.
+    \item[/transport]
+    Logovací výpisy vytvořené skriptem pro přenos vah.
+    \item[/distributed]
+    Logovací výpisy vytvořené skriptem pro distribuované trénování.
+    \item[/results.ods]
+    Výsledky trénování a přenosů vah ve formátu OpenDocument Spreadsheet.
+    \item[/report.pdf]
+    Elektronická verze tohoto dokumentu.
+    \item[/poster.pdf]
+    Elektronická verze plakátu.
+\end{description}
+
+Složka {\tt /src} obsahuje mnoho skriptů a jiných pomocných souborů.
+Význam a obsah každého souboru je popsán v~následujícím seznamu.
+
+\begin{description}[font=\ttfamily\bfseries]
+    \item[abstract\_network.py]
+    Funkčnost sdílená všemi neuronovými sítěmi.
+    \item[barrier.py]
+    Implementace synchronizačního mechanizmu bariéra v~Tensorflow.
+    \item[caltech256\_network.py]
+    Funkčnost sdílená všemi neuronovými sítěmi, které je možné trénovat pomocí trénovací množiny Caltech256.
+    \item[dist.py]
+    Distribuované trénování.
+    \item[distributed.sh]
+    Rozdělení distribuovaného trénování na více jednotek.
+    \item[estimate.py]
+    Výpočet odhadu zrychlení.
+    \item[googlenet.py]
+    Implementace neuronové sítě GoogLeNet pro skripty {\tt dist.py}, {\tt local.py} a {\tt transport.py}.
+    \item[killnodes.sh]
+    Ukončení distribuovaného trénování na více jednotkách.
+    \item[local.py]
+    Lokální trénování.
+    \item[nodefile.txt]
+    Ukázka souboru s~adresami pro distribuovaný výpočet.
+    \item[resnet34.py]
+    Implementace neuronové sítě Resnet34 pro skripty {\tt dist.py}, {\tt local.py} a {\tt transport.py}.
+    \item[squeezenet.py]
+    Implementace neuronové sítě SqueezeNet pro skripty {\tt dist.py}, {\tt local.py} a {\tt transport.py}.
+    \item[transport.py]
+    Měření délky přenosu.
+    \item[vgg16e.py]
+    Implementace neuronové sítě VGG16E pro skripty {\tt dist.py}, {\tt local.py} a {\tt transport.py}.
+\end{description}
+
+\chapter{Požadavky}
+\label{chap:requirements}
+
+\begin{itemize}
+  \item Python 3.5.2 nebo kompatibilní
+  \item matplotlib 1.5.1 nebo kompatibilní
+  \item Tensorflow 1.1 nebo kompatibilní
+\end{itemize}
+
+\chapter{Popis rozhraní}
+\label{chap:interface_description}
+
+
+\section{Lokální trénování}
+\label{sec:script_local}
+
+Skript {\tt local.py} slouží k~lokálnímu trénování neuronových sítí.
+Skript používá rozhraní příkazové řádky.
+Podrobný popis tohoto rozhraní je na následujícím seznamu.
+
+\begin{description}[font=\ttfamily\bfseries]
+    \item[-{}h]
+    Vypiš nápovědu.
+    \item[-{}-datadir DIR]
+    Trénovací množina je uložená v~adresáři {\tt DIR}.
+    \item[-{}-logdir DIR]
+    Logovací výpisy se uloží do adresáře {\tt DIR}.
+    \item[-{}-weights FILE]
+    První hodnoty vah jsou uloženy v~souboru {\tt FILE}.
+    \item[-{}-net FILE]
+    Neuronová síť pro trénování je uložena v~souboru {\tt FILE}.
+    \item[-{}-accuracy]
+    Spočítej přesnost sítě.
+    \item[-{}-profile]
+    Proveď profilování výpočtu.
+    Výsledky jsou uloženy do adresáře pro logovací výstupy. 
+\end{description}
+
+Pokud je zadán přepínač {\tt -h}, všechny ostatní se ignorují.
+Pokud není zadán přepínač {\tt -{}-net}, program se ukončí kvůli chybě na příkazovém řádku.
+
+\section{Přenos vah}
+\label{sec:script_trans}
+
+Skript {\tt transport.py} slouží ke změření délky přenosu vah neuronových sítí ze serveru na pracovní jednotku.
+Musí se spustit na dvou jednotkách (pracovní jednotka a server), mezi kterými změří délku přenosu.
+Skript používá rozhraní příkazové řádky.
+Podrobný popis tohoto rozhraní je na následujícím seznamu.
+
+\begin{description}[font=\ttfamily\bfseries]
+    \item[-{}h]
+    Vypiš nápovědu.
+    \item[-{}-logdir DIR]
+    Logovací výpisy se uloží do adresáře {\tt DIR}.
+    \item[-{}-net FILE]
+    Neuronová síť pro trénování je uložena v~souboru {\tt FILE}.
+    \item[-{}-my-address ADDRESS]
+    Adresa této jednotky.
+    \item[-{}-other-address ADDRESS]
+    Adresa jiné jednotky.
+    \item[-{}-my-role ROLE]
+    Role této jednotky.
+    Parametr {\tt ROLE} může nabývat hodnot {\tt ps} pro server s~parametry a {\tt worker} pro pracovní jednotku.
+\end{description}
+
+Pokud je zadán přepínač {\tt -h}, všechny ostatní se ignorují.
+Pokud není zadán přepínač {\tt -{}-net}, program se ukončí kvůli chybě na příkazovém řádku.
+
+\section{Distribuované trénování}
+\label{sec:script_dist}
+
+Skript {\tt dist.py} slouží k~distribuovanému trénování neuronových sítí.
+Musí se spustit na každé jednotce, která bude použita pro trénování.
+Skript používá rozhraní příkazové řádky.
+Podrobný popis tohoto rozhraní je na následujícím seznamu.
+
+\begin{description}[font=\ttfamily\bfseries]
+    \item[-{}h]
+    Vypiš nápovědu.
+    \item[-{}-datadir DIR]
+    Trénovací množina je uložená v~adresáři {\tt DIR}.
+    \item[-{}-logdir DIR]
+    Logovací výpisy se uloží do adresáře {\tt DIR}.
+    \item[-{}-weights FILE]
+    První hodnoty vah jsou uloženy v~souboru {\tt FILE}.
+    \item[-{}-net FILE]
+    Neuronová síť pro trénování je uložena v~souboru {\tt FILE}.
+    \item[-{}-nodefile FILE]
+    Seznam adres pracovních jednotek oddělených novým řádkem je uložený v~souboru {\tt FILE}.
+    \item[-{}-index INDEX]
+    Index adresy této pracovní jednotky v~seznamu adres pracovních jednotek je {\tt INDEX}.
+    \item[-{}-sync SYNC]
+    Způsob synchronizace trénování je {\tt SYNC}.
+    \item[-{}-server TYPE]
+    Typ serveru pro uložení parametrů je {\tt TYPE}.
+    Hodnota {\tt central} značí centrální server, hodnota {\tt distributed} značí distribuovaný server.
+    \item[-{}-accuracy]
+    Spočítej přesnost sítě.
+    \item[-{}-profile]
+    Proveď profilování výpočtu.
+    Výsledky jsou uloženy do adresáře pro logovací výstupy. 
+\end{description}
+
+Pokud je zadán přepínač {\tt -h}, všechny ostatní se ignorují.
+Pokud není zadán přepínač {\tt -{}-net}, program se ukončí kvůli chybě na příkazovém řádku.
+Hodnoty, kterých může nabývat parametr {\tt SYNC} přepínače {\tt -{}-sync}, jsou vypsány v~následujícím seznamu.
+
+\begin{description}[font=\ttfamily\bfseries]
+    \item[none]
+    Asynchronní trénování.
+    \item[join]
+    Synchronní trénování se spojením dávek.
+    \item[split]
+    Synchronní trénování s~rozdělením dávek.
+\end{description}
+
+\section{Výpočet odhadů zrychlení}
+\label{sec:script_est}
+
+Skript {\tt estimate.py} slouží k~odhadu zrychlení při trénování na více výpočetních jednotkách.
+Skript používá rozhraní příkazové řádky.
+Podrobný popis tohoto rozhraní je na následujícím seznamu.
+
+\begin{description}[font=\ttfamily\bfseries]
+    \item[-{}h]
+    Vypiš nápovědu.
+    \item[-{}-t-grad TIME]
+    Délka výpočtu gradientů je {\tt TIME}.
+    \item[-{}-t-comm TIME]
+    Délka přenosu vah sítě je {\tt TIME}.
+    \item[-{}-type TYPE]
+    Způsob trénování sítě je {\tt TYPE}.
+    \item[-{}-server TYPE]
+    Typ serveru pro uložení parametrů je {\tt TYPE}.
+    Hodnota {\tt central} značí centrální server, hodnota {\tt distributed} značí distribuovaný server.
+    \item[-{}-workers N]
+    Maximální počet pracovních jednotek je {\tt N}.
+    \item[-{}-batches D]
+    Počet dávek při trénování je {\tt D}.
+    \item[-{}-output OUT]
+    Výstup skriptu je tvaru {\tt OUT}.
+\end{description}
+
+Pokud je zadán přepínač {\tt -h}, všechny ostatní se ignorují.
+Pokud nejsou zadány přepínače {\tt -{}-t-grad} a {\tt -{}-t-comm}, program se ukončí kvůli chybě na příkazovém řádku.
+Hodnoty, kterých může nabývat parametr {\tt SYNC} přepínače {\tt -{}-sync}, jsou vypsány v~následujícím seznamu.
+
+\begin{description}[font=\ttfamily\bfseries]
+    \item[async]
+    Asynchronní trénování.
+    \item[sync-join]
+    Synchronní trénování se spojením dávek.
+    \item[sync-split]
+    Synchronní trénování s~rozdělením dávek.
+\end{description}
+
+Hodnoty, kterých může nabývat parametr {\tt OUT} přepínače {\tt -{}-output}, jsou vypsány v~následujícím seznamu.
+
+\begin{description}[font=\ttfamily\bfseries]
+    \item[single]
+    Výstupem skriptu je pouze hodnota zrychlení na maximální počtu pracovních jednotek.
+    \item[csv]
+    Výstupem skriptu jsou hodnoty zrychlení pro jednu až maximální počet pracovních jednotek oddělené středníky.
+    \item[plot]
+    Skript zobrazí hodnoty zrychlení pro jednu až maximální počet pracovních jednotek pomocí grafu.
+\end{description}
+
+\chapter{Diagramy použitých neuronových sítí}
+\label{chap:nn_diags}
+
+Tato příloha obsahuje diagramy sítí popsaných v~sekcích \ref{sec:vgg16e} až \ref{sec:resnet34}.
+Každý diagram se skládá z~bloků popisující vrstvy sítě a hran, které značí napojení vstupů a výstupů těchto vrstev.
+Vysvětlení činnosti vrstev je uvedeno níže.
+
+\begin{description}
+\item[Konvoluce $\sisetup{tight-spacing=true}n{\times}m{\times}c/s (T)$]
+Konvoluční vrstva, která používá filtr o~velikosti $\sisetup{tight-spacing=true}n{\times}m$, výsledkem sítě je $c$ map příznaků a konvoluce se provádí s~krokem $s$.
+Symbol $T$, značí jakým způsobem se má konvoluce chovat při práci s~okrajovými body.
+Hodnota $S$ (same, stejné) říká, že se má vstup vycpat stejnými hodnotami jako jsou na okrajích.
+Hodnota $V$ (valid, validní) říká, že se počítá pouze s~body vstupu, v~tomto případě bude velikost výstupu menší než velikost vstupu.
+Tomuto parametru se obvykle říká padding (vycpávka).
+\item[Plně propojená $n$]
+Plně propojená vrstva, která obsahuje $n$ neuronů.
+\item[Maxpool $\sisetup{tight-spacing=true}n{\times}m/s$]
+Podvzorkovací vrstva typu maxpool, která používá filtr o~velikosti $\sisetup{tight-spacing=true}n{\times}m$.
+Podvzorkování se provádí s~krokem $s$.
+\item[Avgpool $\sisetup{tight-spacing=true}n{\times}m/s$]
+Podvzorkovací vrstva typu avgpool, která používá filtr o~velikosti $\sisetup{tight-spacing=true}n{\times}m$.
+Podvzorkování se provádí s~krokem $s$.
+\item[Konkatenace $n$]
+Vrstva, která provádí matematickou operaci konkatenace.
+Jejím výsledkem je $n$ map příznaků.
+\item[Sčítací vrstva]
+Vrstva, která provádí matematickou operaci sčítání výstupů z~různých vrstev.
+Všechny vstupy vrstvy musí mít stejnou velikost a výstup vrstvy má stejnou velikost jako vstupy.
+Tato vrstva je v~diagramech označena jako kruh se symbolem $+$ uprostřed.
+\item[Zdvojnásobení počtu map příznaků]
+Tato vrstva provádí zdvojnásobení počtu map příznaků v~reziduálním bloku sítě Resnet34.
+Detailní popis je v~podsekci \ref{sec:resnet34}.
+\item[Softmax]
+Vrstva implementující funkci softmax, která je popsaná v~podsekci \ref{sub:softmax}.
+\end{description}
+
+\begin{figure}
+\begin{adjustbox}{center}
+\scalebox{0.76}{
+\begin{tikzpicture}[auto,node distance=1em and 1em,>=triangle 45]
+    \node [block_conv](conv11){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}64/1 (S)$};
+    \node [block_conv,above=of conv11](conv12){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}64/1 (S)$};
+    \node [block_maxpool,above=of conv12](maxpool1){Maxpool $\sisetup{tight-spacing=true}2{\times}2/2$};
+    \node [block_conv,above=of maxpool1](conv21){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}128/1 (S)$};
+    \node [block_conv,above=of conv21](conv22){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}128/1 (S)$};
+    \node [block_maxpool,above=of conv22](maxpool2){Maxpool $\sisetup{tight-spacing=true}2{\times}2/2$};
+    \node [block_conv,above=of maxpool2](conv31){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}256/1 (S)$};
+    \node [block_conv,above=of conv31](conv32){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}256/1 (S)$};
+    \node [block_conv,above=of conv32](conv33){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}256/1 (S)$};
+    \node [block_conv,above=of conv33](conv34){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}256/1 (S)$};
+    \node [block_maxpool,above=of conv34](maxpool3){Maxpool $\sisetup{tight-spacing=true}2{\times}2/2$};
+    \node [block_conv,above=of maxpool3](conv41){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}512/1 (S)$};
+    \node [block_conv,above=of conv41](conv42){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}512/1 (S)$};
+    \node [block_conv,above=of conv42](conv43){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}512/1 (S)$};
+    \node [block_conv,above=of conv43](conv44){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}512/1 (S)$};
+    \node [block_maxpool,above=of conv44](maxpool4){Maxpool $\sisetup{tight-spacing=true}2{\times}2/2$};
+    \node [block_conv,above=of maxpool4](conv51){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}512/1 (S)$};
+    \node [block_conv,above=of conv51](conv52){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}512/1 (S)$};
+    \node [block_conv,above=of conv52](conv53){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}512/1 (S)$};
+    \node [block_conv,above=of conv53](conv54){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}512/1 (S)$};
+    \node [block_maxpool,above=of conv54](maxpool5){Maxpool $\sisetup{tight-spacing=true}2{\times}2/2$};
+    \node [block_fc,above=of maxpool5](fc1){Plně propojená $4096$};
+    \node [block_fc,above=of fc1](fc2){Plně propojená $4096$};
+    \node [block_fc,above=of fc2](fc3){Plně propojená $1000$};
+    \node [block_softmax,above=of fc3](sm){Softmax};
+    
+    \draw [->] (conv11) -- (conv12);
+    \draw [->] (conv12) -- (maxpool1);
+    \draw [->] (maxpool1) -- (conv21);
+    \draw [->] (conv21) -- (conv22);
+    \draw [->] (conv22) -- (maxpool2);
+    \draw [->] (maxpool2) -- (conv31);
+    \draw [->] (conv31) -- (conv32);
+    \draw [->] (conv32) -- (conv33);
+    \draw [->] (conv33) -- (conv34);
+    \draw [->] (conv34) -- (maxpool3);
+    \draw [->] (maxpool3) -- (conv41);
+    \draw [->] (conv41) -- (conv42);
+    \draw [->] (conv42) -- (conv43);
+    \draw [->] (conv43) -- (conv44);
+    \draw [->] (conv44) -- (maxpool4);
+    \draw [->] (maxpool4) -- (conv51);
+    \draw [->] (conv51) -- (conv52);
+    \draw [->] (conv52) -- (conv53);
+    \draw [->] (conv53) -- (conv54);
+    \draw [->] (conv54) -- (maxpool5);
+    \draw [->] (maxpool5) -- (fc1);
+    \draw [->] (fc1) -- (fc2);
+    \draw [->] (fc2) -- (fc3);
+    \draw [->] (fc3) -- (sm);
+\end{tikzpicture}
+}
+\end{adjustbox}
+\caption{Diagram sítě VGG16E.}
+\label{fig:vgg16e}
+\end{figure}
+
+\begin{figure}
+\begin{adjustbox}{center}
+\scalebox{0.47}{
+\begin{tikzpicture}[auto, node distance=1em and 1em,>=triangle 45]
+
+    \node [block_conv](conv11){Konvoluce $\sisetup{tight-spacing=true}7{\times}7{\times}64/2 (S)$};
+    \node [block_maxpool,above=of conv11](maxpool11){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    \node [block_norm,above=of maxpool11](lrn11){LRN};
+    \node [block_conv,above=of lrn11](conv12){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}64/1 (V)$};
+    \node [block_conv,above=of conv12](conv13){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}192/1 (S)$};
+    \node [block_norm,above=of conv13](lrn12){LRN};
+    \node [block_maxpool,above=of lrn12](maxpool12){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    
+    \draw [->] (conv11) -- (maxpool11);
+    \draw [->] (maxpool11) -- (lrn11);
+    \draw [->] (lrn11) -- (conv12);
+    \draw [->] (conv12) -- (conv13);
+    \draw [->] (conv13) -- (lrn12);
+    \draw [->] (lrn12) -- (maxpool12);
+    
+    \node [block_conv,above=of maxpool12](conv22){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}16/1 (S)$};
+    \node [block_conv,left=of conv22](conv21){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}96/1 (S)$};
+    \node [block_maxpool,right=of conv22](maxpool21){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    \node [block_conv,above=of conv21](conv23){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}128/1 (S)$};
+    \node [block_conv,left=of conv23](conv24){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}64/1 (S)$};
+    \node [block_conv,right=of conv23](conv25){Konvoluce $\sisetup{tight-spacing=true}5{\times}5{\times}32/1 (S)$};
+    \node [block_conv,right=of conv25](conv26){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}32/1 (S)$};
+    \node [block_concat,above=of conv25](concat2){Konkatenace $256$};
+    
+    \draw [->] (maxpool12) -- node [name=input2]{} (conv22);
+    \draw [->] (input2) -| (conv21);
+    \draw [->] (input2) -| (maxpool21);
+    \draw [->] (input2) -| (conv24);
+    \draw [->] (conv21) -- (conv23);
+    \draw [->] (conv22) -- (conv25);
+    \draw [->] (maxpool21) -- (conv26);
+    \draw [<-] (concat2) -| (conv24);
+    \draw [<-] (concat2) -| (conv23);
+    \draw [<-] (concat2) -- (conv25);
+    \draw [<-] (concat2) -| (conv26);
+    
+    \node [block_conv,above=of concat2](conv32){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}32/1 (S)$};
+    \node [block_conv,left=of conv32](conv31){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}128/1 (S)$};
+    \node [block_maxpool,right=of conv32](maxpool31){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    \node [block_conv,above=of conv31](conv33){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}192/1 (S)$};
+    \node [block_conv,left=of conv33](conv34){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}128/1 (S)$};
+    \node [block_conv,right=of conv33](conv35){Konvoluce $\sisetup{tight-spacing=true}5{\times}5{\times}96/1 (S)$};
+    \node [block_conv,right=of conv35](conv36){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}64/1 (S)$};
+    \node [block_concat,above=of conv35](concat3){Konkatenace $480$};
+    
+    \draw [->] (concat2) -- node [name=input3]{} (conv32);
+    \draw [->] (input3) -| (conv31);
+    \draw [->] (input3) -| (maxpool31);
+    \draw [->] (input3) -| (conv34);
+    \draw [->] (conv31) -- (conv33);
+    \draw [->] (conv32) -- (conv35);
+    \draw [->] (maxpool31) -- (conv36);
+    \draw [<-] (concat3) -| (conv34);
+    \draw [<-] (concat3) -| (conv33);
+    \draw [<-] (concat3) -- (conv35);
+    \draw [<-] (concat3) -| (conv36);
+    
+    \node [block_maxpool,above=of concat3](maxpool4){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    \draw [->] (concat3) -- (maxpool4);
+    
+    \node [block_conv,above=of maxpool4](conv42){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}16/1 (S)$};
+    \node [block_conv,left=of conv42](conv41){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}96/1 (S)$};
+    \node [block_maxpool,right=of conv42](maxpool41){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    \node [block_conv,above=of conv41](conv43){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}208/1 (S)$};
+    \node [block_conv,left=of conv43](conv44){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}192/1 (S)$};
+    \node [block_conv,right=of conv43](conv45){Konvoluce $\sisetup{tight-spacing=true}5{\times}5{\times}48/1 (S)$};
+    \node [block_conv,right=of conv45](conv46){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}64/1 (S)$};
+    \node [block_concat,above=of conv45](concat4){Konkatenace $512$};
+    
+    \draw [->] (maxpool4) -- node [name=input4]{} (conv42);
+    \draw [->] (input4) -| (conv41);
+    \draw [->] (input4) -| (maxpool41);
+    \draw [->] (input4) -| (conv44);
+    \draw [->] (conv41) -- (conv43);
+    \draw [->] (conv42) -- (conv45);
+    \draw [->] (maxpool41) -- (conv46);
+    \draw [<-] (concat4) -| (conv44);
+    \draw [<-] (concat4) -| (conv43);
+    \draw [<-] (concat4) -- (conv45);
+    \draw [<-] (concat4) -| (conv46);
+    
+    \node [block_conv,above=of concat4](conv52){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}24/1 (S)$};
+    \node [block_conv,left=of conv52](conv51){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}112/1 (S)$};
+    \node [block_maxpool,right=of conv52](maxpool51){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    \node [block_conv,above=of conv51](conv53){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}224/1 (S)$};
+    \node [block_conv,left=of conv53](conv54){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}160/1 (S)$};
+    \node [block_conv,right=of conv53](conv55){Konvoluce $\sisetup{tight-spacing=true}5{\times}5{\times}64/1 (S)$};
+    \node [block_conv,right=of conv55](conv56){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}64/1 (S)$};
+    \node [block_concat,above=of conv55](concat5){Konkatenace $512$};
+    
+    \draw [->] (concat4) -- node [name=input5]{} (conv52);
+    \draw [->] (input5) -| (conv51);
+    \draw [->] (input5) -| (maxpool51);
+    \draw [->] (input5) -| (conv54);
+    \draw [->] (conv51) -- (conv53);
+    \draw [->] (conv52) -- (conv55);
+    \draw [->] (maxpool51) -- (conv56);
+    \draw [<-] (concat5) -| (conv54);
+    \draw [<-] (concat5) -| (conv53);
+    \draw [<-] (concat5) -- (conv55);
+    \draw [<-] (concat5) -| (conv56);
+    
+    \node [block_avgpool,right=30em of input5](avgpoola1){Avgpool $\sisetup{tight-spacing=true}5{\times}5/1 (V)$};
+    \node [block_conv,above=of avgpoola1](conva1){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}128/1 (S)$};
+    \node [block_fc,above=of conva1](fca11){Plně propojená $1000$};
+    \node [block_fc,above=of fca11](fca12){Plně propojená $1000$};
+    \node [block_softmax,above=of fca12](sma1){Softmax};
+    
+    \draw [->] (input5) -- (avgpoola1);
+    \draw [->] (avgpoola1) -- (conva1);
+    \draw [->] (conva1) -- (fca11);
+    \draw [->] (fca11) -- (fca12);
+    \draw [->] (fca12) -- (sma1);
+    
+    \node [block_conv,above=of concat5](conv62){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}24/1 (S)$};
+    \node [block_conv,left=of conv62](conv61){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}128/1 (S)$};
+    \node [block_maxpool,right=of conv62](maxpool61){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    \node [block_conv,above=of conv61](conv63){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}256/1 (S)$};
+    \node [block_conv,left=of conv63](conv64){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}128/1 (S)$};
+    \node [block_conv,right=of conv63](conv65){Konvoluce $\sisetup{tight-spacing=true}5{\times}5{\times}64/1 (S)$};
+    \node [block_conv,right=of conv65](conv66){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}64/1 (S)$};
+    \node [block_concat,above=of conv65](concat6){Konkatenace $512$};
+    
+    \draw [->] (concat5) -- node [name=input6]{} (conv62);
+    \draw [->] (input6) -| (conv61);
+    \draw [->] (input6) -| (maxpool61);
+    \draw [->] (input6) -| (conv64);
+    \draw [->] (conv61) -- (conv63);
+    \draw [->] (conv62) -- (conv65);
+    \draw [->] (maxpool61) -- (conv66);
+    \draw [<-] (concat6) -| (conv64);
+    \draw [<-] (concat6) -| (conv63);
+    \draw [<-] (concat6) -- (conv65);
+    \draw [<-] (concat6) -| (conv66);
+    
+    \node [block_conv,above=of concat6](conv72){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}32/1 (S)$};
+    \node [block_conv,left=of conv72](conv71){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}144/1 (S)$};
+    \node [block_maxpool,right=of conv72](maxpool71){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    \node [block_conv,above=of conv71](conv73){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}288/1 (S)$};
+    \node [block_conv,left=of conv73](conv74){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}112/1 (S)$};
+    \node [block_conv,right=of conv73](conv75){Konvoluce $\sisetup{tight-spacing=true}5{\times}5{\times}64/1 (S)$};
+    \node [block_conv,right=of conv75](conv76){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}64/1 (S)$};
+    \node [block_concat,above=of conv75](concat7){Konkatenace $528$};
+    
+    \draw [->] (concat6) -- node [name=input7]{} (conv72);
+    \draw [->] (input7) -| (conv71);
+    \draw [->] (input7) -| (maxpool71);
+    \draw [->] (input7) -| (conv74);
+    \draw [->] (conv71) -- (conv73);
+    \draw [->] (conv72) -- (conv75);
+    \draw [->] (maxpool71) -- (conv76);
+    \draw [<-] (concat7) -| (conv74);
+    \draw [<-] (concat7) -| (conv73);
+    \draw [<-] (concat7) -- (conv75);
+    \draw [<-] (concat7) -| (conv76);
+    
+    \node [block_conv,above=of concat7](conv82){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}32/1 (S)$};
+    \node [block_conv,left=of conv82](conv81){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}160/1 (S)$};
+    \node [block_maxpool,right=of conv82](maxpool81){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    \node [block_conv,above=of conv81](conv83){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}320/1 (S)$};
+    \node [block_conv,left=of conv83](conv84){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}256/1 (S)$};
+    \node [block_conv,right=of conv83](conv85){Konvoluce $\sisetup{tight-spacing=true}5{\times}5{\times}128/1 (S)$};
+    \node [block_conv,right=of conv85](conv86){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}128/1 (S)$};
+    \node [block_concat,above=of conv85](concat8){Konkatenace $832$};
+    
+    \draw [->] (concat7) -- node [name=input8]{} (conv82);
+    \draw [->] (input8) -| (conv81);
+    \draw [->] (input8) -| (maxpool81);
+    \draw [->] (input8) -| (conv84);
+    \draw [->] (conv81) -- (conv83);
+    \draw [->] (conv82) -- (conv85);
+    \draw [->] (maxpool81) -- (conv86);
+    \draw [<-] (concat8) -| (conv84);
+    \draw [<-] (concat8) -| (conv83);
+    \draw [<-] (concat8) -- (conv85);
+    \draw [<-] (concat8) -| (conv86);
+    
+    \node [block_avgpool,right=30em of input8](avgpoola2){Avgpool $\sisetup{tight-spacing=true}5{\times}5/3 (V)$};
+    \node [block_conv,above=of avgpoola2](conva2){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}128/1 (S)$};
+    \node [block_fc,above=of conva2](fca21){Plně propojená $1000$};
+    \node [block_fc,above=of fca21](fca22){Plně propojená $1000$};
+    \node [block_softmax,above=of fca22](sma2){Softmax};
+    
+    \draw [->] (input8) -- (avgpoola2);
+    \draw [->] (avgpoola2) -- (conva2);
+    \draw [->] (conva2) -- (fca21);
+    \draw [->] (fca21) -- (fca22);
+    \draw [->] (fca22) -- (sma2);
+    
+    \node [block_maxpool,above=of concat8](maxpool9){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    \draw [->] (concat8) -- (maxpool9);
+    
+    \node [block_conv,above=of maxpool9](conv92){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}32/1 (S)$};
+    \node [block_conv,left=of conv92](conv91){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}160/1 (S)$};
+    \node [block_maxpool,right=of conv92](maxpool91){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    \node [block_conv,above=of conv91](conv93){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}320/1 (S)$};
+    \node [block_conv,left=of conv93](conv94){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}256/1 (S)$};
+    \node [block_conv,right=of conv93](conv95){Konvoluce $\sisetup{tight-spacing=true}5{\times}5{\times}128/1 (S)$};
+    \node [block_conv,right=of conv95](conv96){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}128/1 (S)$};
+    \node [block_concat,above=of conv95](concat9){Konkatenace $832$};
+    
+    \draw [->] (maxpool9) -- node [name=input9]{} (conv92);
+    \draw [->] (input9) -| (conv91);
+    \draw [->] (input9) -| (maxpool91);
+    \draw [->] (input9) -| (conv94);
+    \draw [->] (conv91) -- (conv93);
+    \draw [->] (conv92) -- (conv95);
+    \draw [->] (maxpool91) -- (conv96);
+    \draw [<-] (concat9) -| (conv94);
+    \draw [<-] (concat9) -| (conv93);
+    \draw [<-] (concat9) -- (conv95);
+    \draw [<-] (concat9) -| (conv96);
+    
+    \node [block_conv,above=of concat9](conv102){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}48/1 (S)$};
+    \node [block_conv,left=of conv102](conv101){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}192/1 (S)$};
+    \node [block_maxpool,right=of conv102](maxpool101){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    \node [block_conv,above=of conv101](conv103){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}384/1 (S)$};
+    \node [block_conv,left=of conv103](conv104){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}384/1 (S)$};
+    \node [block_conv,right=of conv103](conv105){Konvoluce $\sisetup{tight-spacing=true}5{\times}5{\times}128/1 (S)$};
+    \node [block_conv,right=of conv105](conv106){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}128/1 (S)$};
+    \node [block_concat,above=of conv105](concat10){Konkatenace $1024$};
+    
+    \draw [->] (concat9) -- node [name=input10]{} (conv102);
+    \draw [->] (input10) -| (conv101);
+    \draw [->] (input10) -| (maxpool101);
+    \draw [->] (input10) -| (conv104);
+    \draw [->] (conv101) -- (conv103);
+    \draw [->] (conv102) -- (conv105);
+    \draw [->] (maxpool101) -- (conv106);
+    \draw [<-] (concat10) -| (conv104);
+    \draw [<-] (concat10) -| (conv103);
+    \draw [<-] (concat10) -- (conv105);
+    \draw [<-] (concat10) -| (conv106);
+    
+    \node [block_avgpool,above=of concat10](avgpool11){Avgpool $\sisetup{tight-spacing=true}7{\times}7/1$};
+    \node [block_dropout,above=of avgpool11](dropout11){Dropout $40\%$};
+    \node [block_fc,above=of dropout11](fc11){Plně propojená $1000$};
+    \node [block_softmax,above=of fc11](sm){Softmax};
+    
+    \draw [->] (concat10) -- (avgpool11);
+    \draw [->] (avgpool11) -- (dropout11);
+    \draw [->] (dropout11) -- (fc11);
+    \draw [->] (fc11) -- (sm);
+
+\end{tikzpicture}
+}
+\end{adjustbox}
+\caption{Diagram sítě GoogLeNet.}
+\label{fig:googlenet}
+\end{figure}
+
+\begin{figure}
+\begin{adjustbox}{center}
+\scalebox{0.59}{
+\begin{tikzpicture}[auto, node distance=1em and 1em,>=triangle 45]
+
+    \node [block_conv](conv11){Konvoluce $\sisetup{tight-spacing=true}7{\times}7{\times}64/2 (S)$};
+    \node [block_maxpool,above=of conv11](maxpool11){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    
+    \draw [->] (conv11) -- (maxpool11);
+    
+    \node [block_conv,above=of maxpool11](conv21){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}16/1 (S)$};
+    \node [block_conv,above=of conv21](conv22){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}64/1 (S)$};
+    \node [block_conv,left=of conv22](conv23){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}64/1 (S)$};
+    \node [block_concat,above=of conv22](concat2){Konkatenace $128$};
+    
+    \draw [->] (maxpool11) -- (conv21);
+    \draw [->] (conv21) -- (conv22);
+    \draw [->] (conv21) -| (conv23);
+    \draw [->] (conv22) -- (concat2);
+    \draw [<-] (concat2) -| (conv23);
+    
+    \node [block_conv,above=of concat2](conv31){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}16/1 (S)$};
+    \node [block_conv,above=of conv31](conv32){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}64/1 (S)$};
+    \node [block_conv,left=of conv32](conv33){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}64/1 (S)$};
+    \node [block_concat,above=of conv32](concat3){Konkatenace $128$};
+    
+    \draw [->] (concat2) -- (conv31);
+    \draw [->] (conv31) -- (conv32);
+    \draw [->] (conv31) -| (conv33);
+    \draw [->] (conv32) -- (concat3);
+    \draw [<-] (concat3) -| (conv33);
+    
+    \node [block_conv,above=of concat3](conv41){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}32/1 (S)$};
+    \node [block_conv,above=of conv41](conv42){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}128/1 (S)$};
+    \node [block_conv,left=of conv42](conv43){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}128/1 (S)$};
+    \node [block_concat,above=of conv42](concat4){Konkatenace $256$};
+    
+    \draw [->] (concat3) -- (conv41);
+    \draw [->] (conv41) -- (conv42);
+    \draw [->] (conv41) -| (conv43);
+    \draw [->] (conv42) -- (concat4);
+    \draw [<-] (concat4) -| (conv43);
+    
+    \node [block_maxpool,above=of concat4](maxpool4){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    
+    \draw [->] (concat4) -- (maxpool4);
+    
+    \node [block_conv,above=of maxpool4](conv51){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}32/1 (S)$};
+    \node [block_conv,above=of conv51](conv52){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}128/1 (S)$};
+    \node [block_conv,left=of conv52](conv53){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}128/1 (S)$};
+    \node [block_concat,above=of conv52](concat5){Konkatenace $256$};
+    
+    \draw [->] (maxpool4) -- (conv51);
+    \draw [->] (conv51) -- (conv52);
+    \draw [->] (conv51) -| (conv53);
+    \draw [->] (conv52) -- (concat5);
+    \draw [<-] (concat5) -| (conv53);
+    
+    \node [block_conv,above=of concat5](conv61){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}48/1 (S)$};
+    \node [block_conv,above=of conv61](conv62){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}192/1 (S)$};
+    \node [block_conv,left=of conv62](conv63){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}192/1 (S)$};
+    \node [block_concat,above=of conv62](concat6){Konkatenace $384$};
+    
+    \draw [->] (concat5) -- (conv61);
+    \draw [->] (conv61) -- (conv62);
+    \draw [->] (conv61) -| (conv63);
+    \draw [->] (conv62) -- (concat6);
+    \draw [<-] (concat6) -| (conv63);
+    
+    \node [block_conv,above=of concat6](conv71){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}48/1 (S)$};
+    \node [block_conv,above=of conv71](conv72){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}192/1 (S)$};
+    \node [block_conv,left=of conv72](conv73){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}192/1 (S)$};
+    \node [block_concat,above=of conv72](concat7){Konkatenace $384$};
+    
+    \draw [->] (concat6) -- (conv71);
+    \draw [->] (conv71) -- (conv72);
+    \draw [->] (conv71) -| (conv73);
+    \draw [->] (conv72) -- (concat7);
+    \draw [<-] (concat7) -| (conv73);
+    
+    \node [block_conv,above=of concat7](conv81){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}64/1 (S)$};
+    \node [block_conv,above=of conv81](conv82){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}256/1 (S)$};
+    \node [block_conv,left=of conv82](conv83){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}256/1 (S)$};
+    \node [block_concat,above=of conv82](concat8){Konkatenace $512$};
+    
+    \draw [->] (concat7) -- (conv81);
+    \draw [->] (conv81) -- (conv82);
+    \draw [->] (conv81) -| (conv83);
+    \draw [->] (conv82) -- (concat8);
+    \draw [<-] (concat8) -| (conv83);
+    
+    \node [block_maxpool,above=of concat8](maxpool8){Maxpool $\sisetup{tight-spacing=true}3{\times}3/2 (S)$};
+    
+    \draw [->] (concat8) -- (maxpool8);
+    
+    \node [block_conv,above=of maxpool8](conv91){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}64/1 (S)$};
+    \node [block_conv,above=of conv91](conv92){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}256/1 (S)$};
+    \node [block_conv,left=of conv92](conv93){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}256/1 (S)$};
+    \node [block_concat,above=of conv92](concat9){Konkatenace $512$};
+    
+    \draw [->] (maxpool8) -- (conv91);
+    \draw [->] (conv91) -- (conv92);
+    \draw [->] (conv91) -| (conv93);
+    \draw [->] (conv92) -- (concat9);
+    \draw [<-] (concat9) -| (conv93);
+    
+    \node [block_dropout,above=of concat9](dropout10){Dropout $50\%$};
+    \node [block_conv,above=of dropout10](conv10){Konvoluce $\sisetup{tight-spacing=true}1{\times}1{\times}1000/1 (V)$};
+    \node [block_avgpool,above=of conv10](avgpool10){Avgpool $\sisetup{tight-spacing=true}14{\times}14/1$};
+    \node [block_softmax,above=of avgpool10](sm){Softmax};
+    
+    \draw [->] (concat9) -- (dropout10);
+    \draw [->] (dropout10) -- (conv10);
+    \draw [->] (conv10) -- (avgpool10);
+    \draw [->] (avgpool10) -- (sm);
+
+\end{tikzpicture}
+}
+\end{adjustbox}
+\caption{Diagram sítě SqueezeNet.}
+\label{fig:squeezenet}
+\end{figure}
+
+\begin{figure}
+\begin{adjustbox}{center}
+\scalebox{0.63}{
+\begin{tikzpicture}[auto, node distance=1em and 1em,>=triangle 45]
+    \node [block_conv](conv11){Konvoluce $\sisetup{tight-spacing=true}7{\times}7{\times}64/2 (S)$};
+    \node [block_maxpool,above=of conv11](maxpool1){Maxpool $\sisetup{tight-spacing=true}2{\times}2/2$};
+    
+    \draw [->] (conv11) -- (maxpool1);
+    
+    \foreach \i in {2,...,4}
+    {
+        \pgfmathtruncatemacro{\prev}{\i-1};
+        \ifthenelse{\equal{\i}{2}}
+        {
+            \node [block_conv,above=of maxpool\prev](conva\i){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}64/1 (S)$};
+            \draw [->] (maxpool\prev) -- node [name=i\i]{} (conva\i);
+        }
+        {
+            \node [block_conv,above=of sum\prev](conva\i){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}64/1 (S)$};
+            \draw [->] (sum\prev) -- node [name=i\i]{} (conva\i);
+        }
+        \node [block_conv,above=of conva\i](convb\i){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}64/1 (S)$};
+        \node [block_sc,right=of convb\i](sc\i){};
+        \node [block_sum,above=of convb\i](sum\i){+};
+        
+        \draw [->] (i\i) -| (sc\i);
+        \draw [->] (conva\i) -- (convb\i);
+        \draw [->] (convb\i) -- (sum\i);
+        \draw [<-] (sum\i) -| (sc\i);
+    }
+    
+    \foreach \i in {5,...,8}
+    {
+        \pgfmathtruncatemacro{\prev}{\i-1};
+        \node [block_conv,above=of sum\prev](conva\i){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}128/1 (S)$};
+        \ifthenelse{\equal{\i}{5}}
+        {
+            \node [block_conv,above=of conva\i](convb\i){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}128/2 (S)$};
+            \node [block_sc2,right=of convb\i](sc\i){Zdvojnásobení\\ počtu map příznaků};
+        }
+        {
+            \node [block_conv,above=of conva\i](convb\i){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}128/1 (S)$};
+            \node [block_sc,right=of convb\i](sc\i){};
+        }
+        \node [block_sum,above=of convb\i](sum\i){+};
+        
+        \draw [->] (sum\prev) -- node [name=i\i]{} (conva\i);
+        \draw [->] (i\i) -| (sc\i);
+        \draw [->] (conva\i) -- (convb\i);
+        \draw [->] (convb\i) -- (sum\i);
+        \draw [<-] (sum\i) -| (sc\i);
+    }
+    
+    \node [block_point,above=of sum8](midpoint1){};
+    \draw [->] (sum8) -| (midpoint1);
+    
+    \node [block_point,below right=1em and 20em of conv11](midpoint2){};
+    
+    \foreach \i in {9,...,14}
+    {
+        \pgfmathtruncatemacro{\prev}{\i-1};
+        \ifthenelse{\equal{\i}{9}}
+        {
+            \node [block_conv,above=of midpoint2](conva\i){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}256/1 (S)$};
+            \node [block_conv,above=of conva\i](convb\i){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}256/2 (S)$};
+            \node [block_sc2,right=of convb\i](sc\i){Zdvojnásobení\\ počtu map příznaků};
+            \draw [->] (midpoint2) -- node [name=i\i]{} (conva\i);
+        }
+        {
+            \node [block_conv,above=of sum\prev](conva\i){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}256/1 (S)$};
+            \node [block_conv,above=of conva\i](convb\i){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}256/1 (S)$};
+            \node [block_sc,right=of convb\i](sc\i){};
+            \draw [->] (sum\prev) -- node [name=i\i]{} (conva\i);
+        }
+        \node [block_sum,above=of convb\i](sum\i){+};
+        
+        \draw [->] (i\i) -| (sc\i);
+        \draw [->] (conva\i) -- (convb\i);
+        \draw [->] (convb\i) -- (sum\i);
+        \draw [<-] (sum\i) -| (sc\i);
+    }
+    
+    \foreach \i in {15,...,17}
+    {
+        \pgfmathtruncatemacro{\prev}{\i-1};
+        \node [block_conv,above=of sum\prev](conva\i){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}512/1 (S)$};
+        \ifthenelse{\equal{\i}{15}}
+        {
+            \node [block_conv,above=of conva\i](convb\i){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}512/2 (S)$};
+            \node [block_sc2,right=of convb\i](sc\i){Zdvojnásobení\\ počtu map příznaků};
+        }
+        {
+            \node [block_conv,above=of conva\i](convb\i){Konvoluce $\sisetup{tight-spacing=true}3{\times}3{\times}512/1 (S)$};
+            \node [block_sc,right=of convb\i](sc\i){};
+        }
+        \node [block_sum,above=of convb\i](sum\i){+};
+        
+        \draw [->] (sum\prev) -- node [name=i\i]{} (conva\i);
+        \draw [->] (i\i) -| (sc\i);
+        \draw [->] (conva\i) -- (convb\i);
+        \draw [->] (convb\i) -- (sum\i);
+        \draw [<-] (sum\i) -| (sc\i);
+    }
+    
+    \draw [->] (midpoint2) -- (conva9);
+    
+    \node [block_avgpool,above=of sum17](avgpool18){Avgpool $\sisetup{tight-spacing=true}7{\times}7/1$};
+    \node [block_fc,above=of avgpool18](fc18){Plně propojená $1000$};
+    \node [block_softmax,above=of fc18](sm){Softmax};
+    
+    \draw [->] (sum17) -- (avgpool18);
+    \draw [->] (avgpool18) -- (fc18);
+    \draw [->] (fc18) -- (sm);
+
+\end{tikzpicture}
+}
+\end{adjustbox}
+\caption{Diagram sítě Resnet34.}
+\label{fig:resnet34}
+\end{figure}
+
